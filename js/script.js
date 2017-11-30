@@ -6,8 +6,8 @@
 ////
 ////
 ////
-var pauseTime   = 500;  // Pause between flipping squares in milliseconds
-var numLoops    = 1000; // Number of times to flip
+var pauseTime   = 2500;  // Pause between flipping squares in milliseconds
+var numLoops    = 10; // Number of times to flip
 var highestImg  = 57;   // Update if there are more images
 
 // Set width to ten times the rowHeight
@@ -52,11 +52,30 @@ function randomIntFromInterval( min,max ){
 }
 
 
+function flipAllRandom() {
+  $( "#mygallery" ).hide(); // Hide all images
+
+  // Change each image position to a random image
+  $("#mygallery").promise().done(function() {
+      $( "img" ).each(function() {
+          var currentID = $(this).attr("id");
+          currentName = $(this).attr( "alt" );
+          nextName = getNextName( currentName );
+          var newSrc = pathStart + nextName + "_" + currentID + imgEnding;
+          $(this).attr("src", newSrc);
+      });
+  });
+
+  // When all images have been updated, fade them back in
+  $( "img" ).promise().done(function() {
+      $( "#mygallery" ).show();
+  })
+};
+
+
 //////////////////////////////////////////////////////
 // On Doc Ready
 $(function() {
-
-
 
     // Build original image:
     // Add html to #mygallery for each of the 100 images
@@ -81,43 +100,13 @@ $(function() {
 
     // Initialize the gallery
     $( "#mygallery" ).justifiedGallery({
-        rowHeight : 50,             // Pixels. For our 10x10, should be width of
-                                    // #mygallery divided by 10.
+        rowHeight : 50,             // Pixels. For our 10x10, should be width of #mygallery divided by 10.
         lastRow : 'nojustify',      // Don't stretch images in last row (if not full)
         margins : 0                 // Pixels between images
     });
 
-    // Randomly flip
-    (function myLoop (i) {
-       setTimeout(function () {
-         randomID = $( "#01" );
-         // randomID.css('display', '');
+    // Flip all photos once every pauseTime
+    setInterval (flipAllRandom, pauseTime);
 
-         // Pick a random picture from the grid to change
-         randomNum = randomIntFromInterval(0,99)
-         randomNum = ("0" + randomNum).slice(-2);
-         randomID = "#" + randomNum;
-
-          // Get current name
-          currentName = $( randomID ).attr("alt");
-
-          // Get next name
-          nextName = getNextName( currentName );
-
-          // Grab actual element
-          randomID = $( randomID );
-
-          // Flip it good
-          randomID.fadeOut('slow', function () {
-            var newSrc = pathStart + nextName + "_" + randomNum + imgEnding;
-            randomID.attr('src', newSrc);
-            randomID.fadeIn('fast');
-          });
-          // Decrement i and call myLoop again if i > 0
-          if (--i) myLoop(i);
-
-       }, pauseTime) // Time per pause, in milliseconds
-
-    })(numLoops); // Number of times to cycle
 
 });
