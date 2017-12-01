@@ -14,6 +14,9 @@ var highestImg  = 57;   // Update if there are more images
 $( "#mygallery" ).css( "margin", "auto" );
 $( "#mygallery" ).css( "width", "501px" );
 
+// Hide alt text when images don't load
+$( "img" ).css( "color:white" );
+
 
 var imgLinks        = ""; // String used to append images to DOM
 var link            = "";
