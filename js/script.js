@@ -14,8 +14,6 @@ var highestImg  = 57;   // Update if there are more images
 $( "#mygallery" ).css( "margin", "auto" );
 $( "#mygallery" ).css( "width", "501px" );
 
-// Hide alt text when images don't load
-$( "img" ).css( "color:white" );
 
 
 var imgLinks        = ""; // String used to append images to DOM
@@ -36,7 +34,7 @@ var randomID        = 0;
 // Get Next Image Name:
 // Given an image name, like img001,
 // return a random name of the same format, like img078
-function getNextName( currentName ){
+function getNextName(){
 
     // SET RANGE of IMAGES
     imgID = randomIntFromInterval(1, highestImg);
@@ -49,11 +47,13 @@ function getNextName( currentName ){
     return nextName;
 };
 
+// Hide alt text when images don't load
+$( "img" ).css( "color:white" );
+
 // Get a random number from an interval
 function randomIntFromInterval( min,max ){
     return Math.floor(Math.random()*(max-min+1)+min);
 }
-
 
 function flipAllRandom() {
   $( "#mygallery" ).hide(); // Hide all images
@@ -61,20 +61,28 @@ function flipAllRandom() {
   // Change each image position to a random image
   $("#mygallery").promise().done(function() {
       $( "img" ).each(function() {
-          var currentID = $(this).attr("id");
-          currentName = $(this).attr( "alt" );
-          nextName = getNextName( currentName );
+          var currentID = $( this ).attr("id");
+          var oldSrc = $( this ).attr("src");
+          nextName = getNextName();
           var newSrc = pathStart + nextName + "_" + currentID + imgEnding;
           $(this).attr("src", newSrc);
+          $( this ).on('error', function(){
+              $(this).attr("src", oldSrc);
+              console.log("using old source " + oldSrc)
+          });
       });
   });
 
   // When all images have been updated, fade them back in
-  $( "img" ).promise().done(function() {
+  $( "#mygallery" ).promise().done(function() {
       $( "#mygallery" ).show();
   })
 };
 
+// Cycle images on click, for testing
+// $("h3").click(function(){
+//   flipAllRandom();
+// });
 
 //////////////////////////////////////////////////////
 // On Doc Ready
@@ -94,7 +102,7 @@ $(function() {
         alt   = firstPic;
 
         // Add image html to imgLinks string
-        imgLinks += '<a href="' + link + '"><img id="' + id + '" alt="' + alt + '" src="' + path + '"/></a>';
+        imgLinks += '<a href="' + link + '"><img id="' + id + '" src="' + path + '"/></a>';
     }
 
     // Append imgLinks string of HTML to #mygallery
